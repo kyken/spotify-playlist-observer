@@ -1,0 +1,32 @@
+{
+  "name": "spotify-playlist-observer",
+  "version": "1.0.0",
+  "description": "spotifyのプレイリストを監視して、差分を検知したらdiscordに発言するbot",
+  "main": "index.js",
+  "scripts": {
+    "start": "ts-node main.ts",
+    "start:init": "MODE=INIT ts-node main.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kyken/spotify-playlist-observer.git"
+  },
+  "author": "kyken",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kyken/spotify-playlist-observer/issues"
+  },
+  "homepage": "https://github.com/kyken/spotify-playlist-observer#readme",
+  "dependencies": {
+    "discord.js": "^12.5.3",
+    "spotify-web-api-node": "^5.0.2",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.1.3",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "@types/shelljs": "^0.8.8",
+    "@types/spotify-web-api-node": "^5.0.2",
+    "@types/uuid": "^8.3.0"
+  }
+}
