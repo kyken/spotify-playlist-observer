@@ -14,16 +14,16 @@ let isShuttingDown = false;
 let isProcessing = false;
 const PROCESS_ID = uuid.v4();
 console.log(`[${PROCESS_ID}] Batch Process ID is ${PROCESS_ID}`);
-const MODE = process.env.MODE || "NO-INIT"
+let MODE = process.env.MODE || "NO-INIT"
 
 const main = async () => {
   const spotifyApiClient = SpotifyApiClient();
   const discordWebhookClient = DiscordWebhookClient();
-  const credentialData = await spotifyApiClient.clientCredentialsGrant();
-  spotifyApiClient.setAccessToken(credentialData.body["access_token"]);
 
   while (!isShuttingDown) {
     isProcessing = true;
+    const credentialData = await spotifyApiClient.clientCredentialsGrant();
+    spotifyApiClient.setAccessToken(credentialData.body["access_token"]);
     try {
       let offset = 0;
       const playlist = await spotifyApiClient.getPlaylist(
@@ -107,11 +107,13 @@ const main = async () => {
           username: discordConfig.message.botName,
           embeds: [embed],
         });
-        fs.writeFileSync(
-          "./data/data.json",
-          JSON.stringify(trackDataList, null, 2)
-        );
+      }else{
+        MODE = "NoInit"
       }
+      fs.writeFileSync(
+        "./data/data.json",
+        JSON.stringify(trackDataList, null, 2)
+      );
       fs.writeFileSync(
         "./data/fullData.json",
         JSON.stringify(fullTrackData, null, 2)
@@ -121,7 +123,7 @@ const main = async () => {
       console.log(JSON.stringify(error));
     } finally {
       isProcessing = false;
-      await sleep(30000);
+      await sleep(5000);
     }
   }
 };
