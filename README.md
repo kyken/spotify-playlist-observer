@@ -1,0 +1,2 @@
+# spotify-playlist-observer
+spotifyのプレイリストを監視して、差分を検知したらdiscordに発言するbot
