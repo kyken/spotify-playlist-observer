@@ -99,7 +99,7 @@ const main = async () => {
 
         const embed = {
           color: 0x0099ff,
-          title: discordConfig.message.title.replace("{playlistName}", playlist.body.name),
+          title: discordConfig.message.title.replace("${playlistName}", playlist.body.name),
           url: playlist.body.external_urls.spotify,
           fields: field,
         };
@@ -109,6 +109,7 @@ const main = async () => {
         });
       }else{
         MODE = "NoInit"
+        console.log("nothing to do now...")
       }
       fs.writeFileSync(
         "./data/data.json",
@@ -118,10 +119,11 @@ const main = async () => {
         "./data/fullData.json",
         JSON.stringify(fullTrackData, null, 2)
       );
+      isProcessing = false;
+      process.exit(0);
     } catch (error) {
       console.log(`[${PROCESS_ID}] ${error.name}`);
       console.log(JSON.stringify(error));
-    } finally {
       isProcessing = false;
       await sleep(5000);
     }
