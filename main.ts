@@ -60,7 +60,7 @@ const main = async () => {
 
           trackDataList.push(trackData);
         }
-        if (playlistData.body.items.length !== 100) {
+        if (playlistData.body.items.length < 100) {
           break;
         }
         offset = offset + 100;
