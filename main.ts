@@ -25,17 +25,16 @@ const main = async () => {
     const credentialData = await spotifyApiClient.clientCredentialsGrant();
     spotifyApiClient.setAccessToken(credentialData.body["access_token"]);
     try {
-      let offset = 0;
+      const beforeTracks = jsonData;
+      let offset = beforeTracks.length;
       const playlist = await spotifyApiClient.getPlaylist(
         spotifyConfig.playlistId
       );
       let playlistData = await spotifyApiClient.getPlaylistTracks(
         spotifyConfig.playlistId,
-        { limit: 100, offset: 100 * offset }
+        { limit: 100, offset }
       );
-      let fullTrackData = [];
       let trackDataList: TrackModel[] = [];
-      const beforeTracks = jsonData;
       while (true && playlistData.body.items) {
         const users = Array.from(
           new Set(playlistData.body.items.map((item) => item.added_by.id))
@@ -60,15 +59,14 @@ const main = async () => {
           };
 
           trackDataList.push(trackData);
-          fullTrackData.push(track);
         }
         if (playlistData.body.items.length !== 100) {
           break;
         }
-        offset = offset + 1;
+        offset = offset + 100;
         playlistData = await spotifyApiClient.getPlaylistTracks(
           spotifyConfig.playlistId,
-          { limit: 100, offset: 100 * offset }
+          { limit: 100, offset }
         );
       }
       const newTracks = trackDataList.filter(
@@ -76,48 +74,40 @@ const main = async () => {
           !beforeTracks.map((oldTrack) => oldTrack.id).includes(newTrack.id)
       );
       if (newTracks.length !== 0 && MODE !== "INIT") {
-        const field: EmbedFieldData[] = newTracks
-          .map((track) => {
-            return [
-              {
-                name: "投稿者",
-                value: `[${track.add_info.add_user_name}](${track.add_info.add_user_external_url})`,
-              },
-              {
-                name: "曲名",
-                value: `[${track.name}](${track.external_url})`,
-                inline: true,
-              },
-              {
-                name: "アーティスト",
-                value: track.artists,
-                inline: true,
-              },
-            ];
-          })
-          .flat();
-
-        const embed = {
-          color: 0x0099ff,
-          title: discordConfig.message.title.replace("${playlistName}", playlist.body.name),
-          url: playlist.body.external_urls.spotify,
-          fields: field,
-        };
-        await discordWebhookClient.send("", {
-          username: discordConfig.message.botName,
-          embeds: [embed],
-        });
+          for(const track of newTracks) {
+            const embed = {
+              color: 0x0099ff,
+              title: discordConfig.message.title.replace("${playlistName}", playlist.body.name),
+              url: playlist.body.external_urls.spotify,
+              fields: [
+                {
+                  name: "投稿者",
+                  value: `${track.add_info.add_user_name}`,
+                },
+                {
+                  name: "曲名",
+                  value: `[${track.name}](${track.external_url})`,
+                  inline: true,
+                },
+                {
+                  name: "アーティスト",
+                  value: track.artists,
+                  inline: true,
+                },
+              ],
+            };
+            await discordWebhookClient.send("", {
+              username: discordConfig.message.botName,
+              embeds: [embed],
+            });
+          }
       }else{
         MODE = "NoInit"
         console.log("nothing to do now...")
       }
       fs.writeFileSync(
         "./data/data.json",
-        JSON.stringify(trackDataList, null, 2)
-      );
-      fs.writeFileSync(
-        "./data/fullData.json",
-        JSON.stringify(fullTrackData, null, 2)
+        JSON.stringify(beforeTracks.concat(newTracks), null, 2)
       );
       isProcessing = false;
       process.exit(0);
