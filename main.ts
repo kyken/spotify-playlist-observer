@@ -1,10 +1,5 @@
 import * as uuid from "uuid";
-import {
-  DiscordWebhookClient,
-  EmbedFieldData,
-  sleep,
-  SpotifyApiClient,
-} from "./lib";
+import { DiscordWebhookClient, sleep, SpotifyApiClient } from "./lib";
 
 import { discordConfig, spotifyConfig } from "./config";
 import jsonData, { TrackModel } from "./data";
@@ -14,7 +9,7 @@ let isShuttingDown = false;
 let isProcessing = false;
 const PROCESS_ID = uuid.v4();
 console.log(`[${PROCESS_ID}] Batch Process ID is ${PROCESS_ID}`);
-let MODE = process.env.MODE || "NO-INIT"
+let MODE = process.env.MODE || "NO-INIT";
 
 const main = async () => {
   const spotifyApiClient = SpotifyApiClient();
@@ -75,36 +70,39 @@ const main = async () => {
           !beforeTracks.map((oldTrack) => oldTrack.id).includes(newTrack.id)
       );
       if (newTracks.length !== 0 && MODE !== "INIT") {
-          for(const track of newTracks) {
-            const embed = {
-              color: 0x0099ff,
-              title: discordConfig.message.title.replace("${playlistName}", playlist.body.name),
-              url: playlist.body.external_urls.spotify,
-              fields: [
-                {
-                  name: "投稿者",
-                  value: `${track.add_info.add_user_name}`,
-                },
-                {
-                  name: "曲名",
-                  value: `[${track.name}](${track.external_url})`,
-                  inline: true,
-                },
-                {
-                  name: "アーティスト",
-                  value: track.artists,
-                  inline: true,
-                },
-              ],
-            };
-            await discordWebhookClient.send("", {
-              username: discordConfig.message.botName,
-              embeds: [embed],
-            });
-          }
-      }else{
-        MODE = "NoInit"
-        console.log("nothing to do now...")
+        for (const track of newTracks) {
+          const embed = {
+            color: 0x0099ff,
+            title: discordConfig.message.title.replace(
+              "${playlistName}",
+              playlist.body.name
+            ),
+            url: playlist.body.external_urls.spotify,
+            fields: [
+              {
+                name: "投稿者",
+                value: `${track.add_info.add_user_name}`,
+              },
+              {
+                name: "曲名",
+                value: `[${track.name}](${track.external_url})`,
+                inline: true,
+              },
+              {
+                name: "アーティスト",
+                value: track.artists,
+                inline: true,
+              },
+            ],
+          };
+          await discordWebhookClient.send("", {
+            username: discordConfig.message.botName,
+            embeds: [embed],
+          });
+        }
+      } else {
+        MODE = "NoInit";
+        console.log("nothing to do now...");
       }
       fs.writeFileSync(
         "./data/data.json",
