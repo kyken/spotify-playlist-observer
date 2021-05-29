@@ -26,7 +26,8 @@ const main = async () => {
     spotifyApiClient.setAccessToken(credentialData.body["access_token"]);
     try {
       const beforeTracks = jsonData;
-      let offset = beforeTracks.length;
+      // [業] 既存トラックの削除を考慮して-50で取り始める
+      let offset = beforeTracks.length - 50;
       const playlist = await spotifyApiClient.getPlaylist(
         spotifyConfig.playlistId
       );
