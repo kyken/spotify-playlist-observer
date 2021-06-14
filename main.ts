@@ -1,5 +1,5 @@
 import * as uuid from "uuid";
-import { DiscordWebhookClient, sleep, SpotifyApiClient } from "./lib";
+import { DiscordWebhookClient, handler, sleep, SpotifyApiClient } from "./lib";
 
 import { discordConfig, spotifyConfig } from "./config";
 import jsonData, { TrackModel } from "./data";
@@ -17,21 +17,21 @@ const main = async () => {
 
   while (!isShuttingDown) {
     isProcessing = true;
-    const credentialData = await spotifyApiClient.clientCredentialsGrant();
+    const credentialData = await handler(spotifyApiClient.clientCredentialsGrant, {});
     spotifyApiClient.setAccessToken(credentialData.body["access_token"]);
     try {
       const beforeTracks = jsonData;
       // [業] 既存トラックの削除を考慮して-50で取り始める
       let offset = beforeTracks.length - 50;
-      const playlist = await spotifyApiClient.getPlaylist(
+      const playlist =  await handler(spotifyApiClient.getPlaylist, 
         spotifyConfig.playlistId
-      );
+      )
       let playlistData = await spotifyApiClient.getPlaylistTracks(
         spotifyConfig.playlistId,
         { limit: 100, offset }
       );
       let trackDataList: TrackModel[] = [];
-      while (true && playlistData.body.items) {
+      while (true && playlistData.body.items) { 
         const users = Array.from(
           new Set(playlistData.body.items.map((item) => item.added_by.id))
         );
