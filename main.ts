@@ -39,7 +39,8 @@ const main = async () => {
         for (const userId of users) {
           userMap[userId] = (await spotifyApiClient.getUser(userId)).body;
         }
-        for (const track of playlistData.body.items) {
+        // なぜかtrackがnullになる場合がある
+        for (const track of playlistData.body.items.filter(item => item.track)) {
           const trackData: TrackModel = {
             id: track.track.id,
             name: track.track.name,
