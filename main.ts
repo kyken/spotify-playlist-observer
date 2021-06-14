@@ -15,7 +15,7 @@ const main = async () => {
   const spotifyApiClient = SpotifyApiClient();
   const discordWebhookClient = DiscordWebhookClient();
 
-  while (!isShuttingDown) {
+  // while (!isShuttingDown) {
     isProcessing = true;
     const credentialData = await spotifyApiClient.clientCredentialsGrant();
     spotifyApiClient.setAccessToken(credentialData.body["access_token"]);
@@ -118,7 +118,7 @@ const main = async () => {
       await sleep(5000);
     }
   }
-};
+// };
 
 const shutdownGracefully = async () => {
   if (isShuttingDown) {
