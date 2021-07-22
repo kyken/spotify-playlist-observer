@@ -22,7 +22,7 @@ const main = async () => {
     try {
       const beforeTracks = jsonData;
       // [業] 既存トラックの削除を考慮して-50で取り始める
-      let offset = beforeTracks.length - 50;
+      let offset = beforeTracks.length >50 ? beforeTracks.length - 50 : 0;
       const playlist = await spotifyApiClient.getPlaylist(
         spotifyConfig.playlistId
       );
